@@ -10,7 +10,6 @@ accountNumber,trxAmount,description,trxDate,trxTime,customerId
 789012,99.99,Refund,2023-01-16,14:45:00,CUST002
 
 Step 1: Setup & Run
-bash
 # Clone project
 git clone https://github.com/sachikantatulu/bank-batch.git
 cd bank-batch
@@ -21,14 +20,12 @@ cp /path/to/dataSource.txt src/main/resources/
 # Build and run
 mvn spring-boot:run
 Step 2: Initialize Users
-bash
 # Insert users (already in import.sql)
 INSERT INTO app_user (username, password, role) VALUES 
   ('admin', '$2a$10$XptfskLsT1l/bRTLRiiCgejHqOpgXFreUnNUa35gJdCr2v2QbVFzu', 'ADMIN'),
   ('user', '$2a$10$XptfskLsT1l/bRTLRiiCgejHqOpgXFreUnNUa35gJdCr2v2QbVFzu', 'USER');
 # Password: "password" (BCrypt encoded)
 Step 3: Test Batch Job
-bash
 curl -X POST http://localhost:8080/api/transactions/batch/start \
   -u admin:password \
   -H "Content-Type: application/json"
@@ -37,7 +34,6 @@ Expected Response:
 Check logs for: BATCH JOB COMPLETED SUCCESSFULLY
 
 Step 4: Test Search API
-bash
 curl -G http://localhost:8080/api/transactions \
   -u user:password \
   --data-urlencode "customerId=CUST001" \
@@ -47,7 +43,6 @@ Expected Response:
 Paginated JSON with matching transactions
 
 Step 5: Test Update with Optimistic Locking
-bash
 # First get current version (e.g., version=0)
 curl http://localhost:8080/api/transactions/1 -u user:password
 
@@ -62,7 +57,6 @@ curl ... -d '{"newDescription":"Conflict", "version":0}'
 Expected Responses:
 
 First: 200 OK with updated transaction (version=1)
-
 Second: 409 Conflict: "Version mismatch"
 
 Step 6: Test Security
