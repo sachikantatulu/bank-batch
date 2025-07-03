@@ -27,7 +27,7 @@ public class TransactionController {
                 .addLong("startAt", System.currentTimeMillis())
                 .toJobParameters();
         jobLauncher.run(importTransactionJob, jobParameters);
-        return ResponseEntity.ok("Batch job started successfully");
+        return ResponseEntity.ok("Batch job started successfully...");
     }
 
     @GetMapping

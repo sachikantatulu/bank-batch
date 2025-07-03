@@ -14,6 +14,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
+
     @ExceptionHandler(ConcurrentUpdateException.class)
     public ResponseEntity<String> handleConcurrentUpdate(ConcurrentUpdateException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());

@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class UpdateDescriptionDto {
     private String newDescription;
-    private Integer version; // For optimistic locking
+    private Integer version; // For Optimistic Locking
 }

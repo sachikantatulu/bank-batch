@@ -98,7 +98,6 @@ public class BatchConfig {
                 log.info("SKIPPING: MISSING TIME");
                 return null;
             }
-
             Transaction transaction = new Transaction();
             transaction.setAccountNumber(accountNumber);
 
@@ -108,9 +107,7 @@ public class BatchConfig {
                 log.info("SKIPPING: INVALID AMOUNT FORMAT: {}", trxAmountStr);
                 return null;
             }
-
             transaction.setDescription(description);
-
             // Parse date and time
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -128,7 +125,6 @@ public class BatchConfig {
                 log.info("SKIPPING: INVALID TIME FORMAT: {}", trxTimeStr);
                 return null;
             }
-
             transaction.setCustomerId(customerId);
             return transaction;
         };

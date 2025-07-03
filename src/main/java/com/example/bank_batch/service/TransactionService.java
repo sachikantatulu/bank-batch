@@ -30,7 +30,6 @@ public class TransactionService {
         if(!transaction.getVersion().equals(version)) {
             throw new ConcurrentUpdateException("Transaction was updated by another user");
         }
-
         transaction.setDescription(newDescription);
         return transactionRepository.save(transaction);
     }

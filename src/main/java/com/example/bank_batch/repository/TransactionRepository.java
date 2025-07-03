@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
+
     @Query("SELECT t FROM Transaction t WHERE " +
             "(:customerId IS NULL OR t.customerId LIKE %:customerId%) AND " +
             "(:accountNumber IS NULL OR t.accountNumber LIKE %:accountNumber%) AND " +
