@@ -1,18 +1,18 @@
-Complete Testing Steps
+Complete Testing Steps:
 Prerequisites
 Java 17+, Maven 3.8+
-
 Postman/curl for API testing
-
 Sample txt file (dataSource.txt):
+
 txt
 accountNumber,trxAmount,description,trxDate,trxTime,customerId
 123456,150.75,Payment,2023-01-15,09:30:00,CUST001
 789012,99.99,Refund,2023-01-16,14:45:00,CUST002
+
 Step 1: Setup & Run
 bash
 # Clone project
-git clone https://github.com/your-repo/bank-batch.git
+git clone https://github.com/sachikantatulu/bank-batch.git
 cd bank-batch
 
 # Add txt to resources
