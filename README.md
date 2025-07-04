@@ -4,14 +4,15 @@ Java 17+, Maven 3.8+
 Postman/curl for API testing
 Sample txt file (dataSource.txt):
 
-txt
-accountNumber,trxAmount,description,trxDate,trxTime,customerId
-123456,150.75,Payment,2023-01-15,09:30:00,CUST001
-789012,99.99,Refund,2023-01-16,14:45:00,CUST002
+txt:
+ACCOUNT_NUMBER|TRX_AMOUNT|DESCRIPTION|TRX_DATE|TRX_TIME|CUSTOMER_ID
+8872838283|123.00|FUND TRANSFER|2019-09-12|11:11:11|222
+8872838283|1123.00|ATM WITHDRWAL|2019-09-11|11:11:11|222
 
 Step 1: Setup & Run
 # Clone project
 git clone https://github.com/sachikantatulu/bank-batch.git
+
 cd bank-batch
 
 # Add txt to resources
@@ -21,10 +22,12 @@ cp /path/to/dataSource.txt src/main/resources/
 mvn spring-boot:run
 Step 2: Initialize Users
 # Insert users (already in import.sql)
-INSERT INTO app_user (username, password, role) VALUES 
-  ('admin', '$2a$10$XptfskLsT1l/bRTLRiiCgejHqOpgXFreUnNUa35gJdCr2v2QbVFzu', 'ADMIN'),
-  ('user', '$2a$10$XptfskLsT1l/bRTLRiiCgejHqOpgXFreUnNUa35gJdCr2v2QbVFzu', 'USER');
+INSERT INTO app_user (username, password, role) VALUES
+  ('admin', '$2a$10$a.HWcaBHsmUwlGb.UcTWGuk2cZVZl6j7vhgB2RXOREiRig.4Q6tI.', 'ADMIN'),
+  ('user', '$2a$10$a.HWcaBHsmUwlGb.UcTWGuk2cZVZl6j7vhgB2RXOREiRig.4Q6tI.', 'USER');
 # Password: "password" (BCrypt encoded)
+we can test through postman easily imprort postman_collection.json to test all endpoints instantly:
+
 Step 3: Test Batch Job
 curl -X POST http://localhost:8080/api/transactions/batch/start \
   -u admin:password \
@@ -34,33 +37,33 @@ Expected Response:
 Check logs for: BATCH JOB COMPLETED SUCCESSFULLY
 
 Step 4: Test Search API
-curl -G http://localhost:8080/api/transactions \
-  -u user:password \
-  --data-urlencode "customerId=CUST001" \
-  --data-urlencode "page=0" \
-  --data-urlencode "size=10"
+curl --location 'http://localhost:8080/api/transactions?customerId=222&page=0&size=5' \
+--header 'Authorization: Basic dXNlcjpwYXNzd29yZA=='
 Expected Response:
-Paginated JSON with matching transactions
+{"content":[{"id":1,"accountNumber":"8872838283","trxAmount":123.0000,"description":"Updated payment","trxDate":"2019-09-12","trxTime":"11:11:11","customerId":"222","version":1},{"id":2,"accountNumber":"8872838283","trxAmount":1123.0000,"description":"ATM WITHDRAWAL","trxDate":"2019-09-11","trxTime":"11:11:11","customerId":"222","version":0},{"id":3,"accountNumber":"8872838283","trxAmount":1223.0000,"description":"FUND TRANSFER","trxDate":"2019-10-11","trxTime":"11:11:11","customerId":"222","version":0},{"id":4,"accountNumber":"8872838283","trxAmount":1233.0000,"description":"3rd Party FUND TRANSFER","trxDate":"2019-11-11","trxTime":"11:11:11","customerId":"222","version":0},{"id":5,"accountNumber":"8872838283","trxAmount":1243.0000,"description":"3rd Party FUND TRANSFER","trxDate":"2019-08-11","trxTime":"11:11:11","customerId":"222","version":0}],"pageable":{"pageNumber":0,"pageSize":5,"sort":{"empty":true,"sorted":false,"unsorted":true},"offset":0,"paged":true,"unpaged":false},"last":false,"totalPages":13,"totalElements":62,"first":true,"size":5,"number":0,"sort":{"empty":true,"sorted":false,"unsorted":true},"numberOfElements":5,"empty":false}
 
 Step 5: Test Update with Optimistic Locking
 # First get current version (e.g., version=0)
 curl http://localhost:8080/api/transactions/1 -u user:password
 
 # Valid update
-curl -X PUT http://localhost:8080/api/transactions/1 \
-  -u user:password \
-  -H "Content-Type: application/json" \
-  -d '{"newDescription":"Updated", "version":0}'
+curl --location --request PUT 'http://localhost:8080/api/transactions/1' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
+--data '{
+  "newDescription": "Updated payment",
+  "version": 0
+}'
 
 # Concurrent update (use same version twice)
 curl ... -d '{"newDescription":"Conflict", "version":0}'
 Expected Responses:
 
 First: 200 OK with updated transaction (version=1)
-Second: 409 Conflict: "Version mismatch"
+Second: 409 Conflict: "Transaction was updated by another user"
 
 Step 6: Test Security
-bash
+
 # Unauthenticated access
 curl -X POST http://localhost:8080/api/transactions/batch/start
 
